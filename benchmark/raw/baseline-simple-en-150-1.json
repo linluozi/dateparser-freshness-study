@@ -1,0 +1,1 @@
+{"impl": "baseline", "workload": "simple-en", "languages": ["en"], "scale": 150, "n": 150, "rep": 1, "elapsed_s": 0.0841625900939107, "us_per_call": 561.0839339594046}

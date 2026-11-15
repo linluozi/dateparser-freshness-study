@@ -32,7 +32,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--src", required=True, help="checkout of dateparser to import")
     ap.add_argument("--impl", required=True, choices=["baseline", "optimized"])
-    ap.add_argument("--workload", default="all", choices=["all", "simple"])
+    ap.add_argument("--workload", default="all", choices=["all", "simple", "simple-en"])
     ap.add_argument("--languages", default="", help="comma-separated languages, empty = autodetect")
     ap.add_argument("--corpus", default=os.path.join(os.path.dirname(__file__), "corpus", "dates.json"))
     ap.add_argument("--scales", default="50,150,400")
@@ -46,10 +46,12 @@ def main():
     import dateparser
 
     corpus = json.load(open(args.corpus, encoding="utf-8"))["strings"]
-    if args.workload == "simple":
+    if args.workload.startswith("simple"):
         corpus = [s for s in corpus if s.isascii() and len(s) <= 40]
     random.Random(SEED).shuffle(corpus)
     langs = args.languages.split(",") if args.languages else None
+    if args.workload == "simple-en" and langs is None:
+        langs = ["en"]
     os.makedirs(args.raw_dir, exist_ok=True)
 
     # One untimed call so lazy locale imports are not charged to the first sample.
