@@ -56,7 +56,7 @@ documented production setting that disables autodetection):
 | 400 | 573.8 us | 531.0 us | 1.081x |
 
 Median speedup is **1.081x**. Disabling autodetection
-drops parse cost from ~5842 us to ~573 us per call on the same
+drops parse cost from ~5842 us to ~574 us per call on the same
 ASCII corpus (a 10.2x difference), i.e. **language detection,
 not the relative-date failure path, is where the time goes**. The guard's share is
 ~10% even in the friendliest configuration, and ~1% with autodetection on.
@@ -115,7 +115,7 @@ above use the public URL because that is what a reader has.
 
 ## 本轮创新
 
-首次用上游自带测试语料给出**优化适用包络 + 否定结论**：该守卫在结构上可证明（`PATTERN` 是 `_parse_date` 唯一的数量来源），1,901 个去重输入逐字节等价；但真实语料上 0.997x，锁定语言后也只有 1.081x。同一语料上关掉语言自动检测把单次解析从 ~5842 us 降到 ~573 us（**10.2x**），首次把"相对日期失败路径"与"语言检测税"放在同一把尺子上量，证明前者不是瓶颈、后者才是——因此正确的动作是显式传 `languages=`，不是合这个补丁。与台账所有 `-opt-lab` 不同，这条交付的是可复现的否定结论 + 语义证书，而不是又一个 1.x 数字。
+首次用上游自带测试语料给出**优化适用包络 + 否定结论**：该守卫在结构上可证明（`PATTERN` 是 `_parse_date` 唯一的数量来源），1,901 个去重输入逐字节等价；但真实语料上 0.997x，锁定语言后也只有 1.081x。同一语料上关掉语言自动检测把单次解析从 ~5842 us 降到 ~574 us（**10.2x**），首次把"相对日期失败路径"与"语言检测税"放在同一把尺子上量，证明前者不是瓶颈、后者才是——因此正确的动作是显式传 `languages=`，不是合这个补丁。与台账所有 `-opt-lab` 不同，这条交付的是可复现的否定结论 + 语义证书，而不是又一个 1.x 数字。
 
 ## License
 
