@@ -74,7 +74,8 @@ type+message) and the internal freshness tuple. Inputs are **sha256-deduplicated
 ## Reproduce
 
 ```bash
-python3 -m pytest tests -q                       # artifact checks (no upstream needed)
+python3 -c "import json;r=json.load(open('benchmark/diff_report.json'));print(r['independent_inputs'],r['mismatches'])"  # 1901 0
+python3 -m pytest tests -q                       # artifact checks (needs pytest, no upstream checkout)
 git clone --depth=1 https://github.com/scrapinghub/dateparser.git /tmp/dp-base
 cp -a /tmp/dp-base /tmp/dp-opt && git -C /tmp/dp-opt apply patch.diff
 python3 benchmark/bench.py --src /tmp/dp-base --impl baseline --workload all --out /tmp/b.json --raw-dir /tmp/raw

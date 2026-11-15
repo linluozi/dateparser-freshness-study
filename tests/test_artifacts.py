@@ -36,6 +36,6 @@ def test_diff_report_has_no_mismatch():
 
 def test_patch_is_one_small_hunk():
     text = open(os.path.join(ROOT, "patch.diff"), encoding="utf-8").read()
-    assert text.count("@@") == 1
+    assert sum(1 for l in text.splitlines() if l.startswith("@@")) == 1
     added = sum(1 for line in text.splitlines() if line.startswith("+") and not line.startswith("+++"))
     assert added <= 10
