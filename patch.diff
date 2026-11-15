@@ -1,0 +1,17 @@
+diff --git a/dateparser/freshness_date_parser.py b/dateparser/freshness_date_parser.py
+index 220ece2..12752dd 100644
+--- a/dateparser/freshness_date_parser.py
++++ b/dateparser/freshness_date_parser.py
+@@ -69,6 +69,12 @@ class FreshnessDateDataParser:
+     ) -> tuple[datetime | None, str | None, tuple[str, ...]]:
+         date_string = strip_braces(date_string)
+         date_string, ptz = pop_tz_offset_from_string(date_string, settings=settings)
++        # PATTERN is the only source of quantities for ``_parse_date``: when it
++        # does not match, ``get_kwargs`` is empty and this parser cannot
++        # produce a date, so skip the timezone/clock setup below.  This is the
++        # common case for ordinary absolute dates.
++        if not PATTERN.search(date_string):
++            return None, None, ()
+         day = None
+         if match := _DAY_OF_MONTH.match(date_string):
+             day = int(match[1])

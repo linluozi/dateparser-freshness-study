@@ -1,0 +1,12 @@
+{
+  "independent_inputs": 1901,
+  "dedup": "sha256 over the input text; one record per unique digest",
+  "compared_fields": [
+    "parse.result_repr",
+    "parse.exception",
+    "freshness.tuple",
+    "freshness.exception"
+  ],
+  "mismatches": 0,
+  "first_mismatches": []
+}
