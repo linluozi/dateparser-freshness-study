@@ -1,0 +1,64 @@
+{
+  "impl": "optimized",
+  "workload": "simple",
+  "languages": [
+    "en"
+  ],
+  "upstream_commit": "1fdf5da3bb96dead01d3ec2777218951a9d1a46b",
+  "seed": 20261115,
+  "corpus_size": 1337,
+  "command": "/tmp/venv/bin/python benchmark/bench.py --src /tmp/dp_opt --impl optimized --workload simple --languages en --scales 50,150,400 --out benchmark/optimized-simple-en.json --raw-dir benchmark/raw",
+  "python": "3.12.3",
+  "cpu": "AMD EPYC 7K62 48-Core Processor",
+  "mem_kb": 3812564,
+  "rss_kb": 31164,
+  "warmup": 3,
+  "reps": 5,
+  "results": [
+    {
+      "scale": 50,
+      "n": 50,
+      "median_us": 499.787162989378,
+      "p25_us": 498.354285955429,
+      "p75_us": 500.69827586412435,
+      "rsd_pct": 0.6064059362365541,
+      "samples_us": [
+        500.69827586412435,
+        499.787162989378,
+        504.62525337934494,
+        498.354285955429,
+        496.51602283120155
+      ]
+    },
+    {
+      "scale": 150,
+      "n": 150,
+      "median_us": 509.66347257296246,
+      "p25_us": 509.19606039921445,
+      "p75_us": 511.5830153226852,
+      "rsd_pct": 3.23385056133633,
+      "samples_us": [
+        547.1198260784149,
+        511.5830153226852,
+        509.19606039921445,
+        509.66347257296246,
+        508.73633474111557
+      ]
+    },
+    {
+      "scale": 400,
+      "n": 400,
+      "median_us": 518.2627309113741,
+      "p25_us": 514.8237384855747,
+      "p75_us": 521.1495840921998,
+      "rsd_pct": 0.937278938974793,
+      "samples_us": [
+        526.3785598799586,
+        514.8237384855747,
+        514.796688221395,
+        518.2627309113741,
+        521.1495840921998
+      ]
+    }
+  ]
+}

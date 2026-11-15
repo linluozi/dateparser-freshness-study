@@ -1,1 +1,1 @@
-{"impl": "optimized", "workload": "simple", "scale": 400, "n": 400, "rep": 1, "elapsed_s": 2.3756981268525124, "us_per_call": 5939.245317131281}
+{"impl": "optimized", "workload": "simple", "languages": ["en"], "scale": 400, "n": 400, "rep": 1, "elapsed_s": 0.2059294953942299, "us_per_call": 514.8237384855747}

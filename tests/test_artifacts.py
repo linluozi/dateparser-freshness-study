@@ -18,7 +18,7 @@ def test_corpus_is_unique_and_real():
 
 def test_both_workloads_cover_three_scales():
     for impl in ("baseline", "optimized"):
-        for workload in ("all", "simple"):
+        for workload in ("all", "simple", "simple-en"):
             payload = load(f"{impl}-{workload}.json")
             assert [r["scale"] for r in payload["results"]] == [50, 150, 400]
             for r in payload["results"]:

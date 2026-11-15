@@ -46,6 +46,21 @@ guard removes real work, but on this corpus that work is a negligible share of
 Conclusion: **do not merge this as a performance fix**; the relative-date failure
 path is not where end-to-end parse time goes on realistic mixed inputs.
 
+Workload `simple-en` — the same ASCII corpus with `languages=["en"]` (the
+documented production setting that disables autodetection):
+
+| n | baseline median | optimized median | speedup |
+|---|---|---|---|
+| 50 | 549.6 us | 499.8 us | 1.100x |
+| 150 | 562.0 us | 509.7 us | 1.103x |
+| 400 | 572.1 us | 518.3 us | 1.104x |
+
+Median speedup is **1.103x**. Disabling autodetection
+drops parse cost from ~5842 us to ~572 us per call on the same
+ASCII corpus (a 10.2x difference), i.e. **language detection,
+not the relative-date failure path, is where the time goes**. The guard's share is
+~10% even in the friendliest configuration, and ~1% with autodetection on.
+
 ## Differential certificate (G2)
 
 `tests/test_diff.py` runs the two checkouts in two independent processes and
@@ -66,8 +81,8 @@ type+message) and the internal freshness tuple. Inputs are **sha256-deduplicated
 |---|---|---|
 | G1 upstream tests | PASS | patched: **25,332 passed, 23 skipped, 4 xfailed, 0 failed** (`python -m pytest tests -q --deselect tests/test_article_dates.py::test_report`; the deselected test forks a process and hits a sandbox `/dev/shm` PermissionError in pristine too) |
 | G2 differential | PASS | 1,901 unique inputs, 0 mismatches (above) |
-| G3 median speedup | **FAIL** | 0.997x < 1.15x |
-| G3b real-corpus speedup | **FAIL** | 1.007x < 1.15x; hence this repo is not named `-opt-lab` |
+| G3 median speedup | **FAIL** | 0.997x (`all`, autodetect), best configuration 1.103x — both < 1.15x |
+| G3b real-corpus speedup | **FAIL** | 1.007x (`simple`), 1.103x (`simple-en`) < 1.15x; hence this repo is not named `-opt-lab` |
 | G4 large-scale | PASS | 400-string scale 1.000x (>= 0.95x) |
 | G5 RSS | PASS | baseline 75692 KiB vs optimized 75700 KiB (ratio 1.000) |
 
@@ -80,6 +95,9 @@ git clone --depth=1 https://github.com/scrapinghub/dateparser.git /tmp/dp-base
 cp -a /tmp/dp-base /tmp/dp-opt && git -C /tmp/dp-opt apply patch.diff
 python3 benchmark/bench.py --src /tmp/dp-base --impl baseline --workload all --out /tmp/b.json --raw-dir /tmp/raw
 python3 benchmark/bench.py --src /tmp/dp-opt  --impl optimized --workload all --out /tmp/o.json --raw-dir /tmp/raw
+# the language-pinned workload that isolates the guard's share:
+python3 benchmark/bench.py --src /tmp/dp-base --impl baseline  --workload simple --languages en --out /tmp/be.json --raw-dir /tmp/raw
+python3 benchmark/bench.py --src /tmp/dp-opt  --impl optimized --workload simple --languages en --out /tmp/oe.json --raw-dir /tmp/raw
 python3 tests/test_diff.py --run /tmp/dp-base /tmp/dp-opt
 ```
 
@@ -97,7 +115,7 @@ above use the public URL because that is what a reader has.
 
 ## 本轮创新
 
-首次用上游自带测试语料**证伪**一个看起来高收益的 failure-path 快路径：该守卫在结构上是可证明的（`PATTERN` 是 `_parse_date` 唯一的数量来源），并在 1,901 个去重输入上逐字节等价；但端到端只有 0.997x，说明"每次都跑的失败解析器"在真实混合语料上并不是瓶颈。与台账里所有 `-opt-lab` 不同，这条给出的是**可复现的否定结论 + 语义证书**，而不是又一个 1.x 数字。
+首次用上游自带测试语料给出**优化适用包络 + 否定结论**：该守卫在结构上可证明（`PATTERN` 是 `_parse_date` 唯一的数量来源），1,901 个去重输入逐字节等价；但真实语料上 0.997x，锁定语言后也只有 1.103x。同一语料上关掉语言自动检测把单次解析从 ~5842 us 降到 ~572 us（**10.2x**），首次把"相对日期失败路径"与"语言检测税"放在同一把尺子上量，证明前者不是瓶颈、后者才是——因此正确的动作是显式传 `languages=`，不是合这个补丁。与台账所有 `-opt-lab` 不同，这条交付的是可复现的否定结论 + 语义证书，而不是又一个 1.x 数字。
 
 ## License
 

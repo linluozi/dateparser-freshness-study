@@ -33,6 +33,7 @@ def main():
     ap.add_argument("--src", required=True, help="checkout of dateparser to import")
     ap.add_argument("--impl", required=True, choices=["baseline", "optimized"])
     ap.add_argument("--workload", default="all", choices=["all", "simple"])
+    ap.add_argument("--languages", default="", help="comma-separated languages, empty = autodetect")
     ap.add_argument("--corpus", default=os.path.join(os.path.dirname(__file__), "corpus", "dates.json"))
     ap.add_argument("--scales", default="50,150,400")
     ap.add_argument("--warmup", type=int, default=3)
@@ -48,26 +49,28 @@ def main():
     if args.workload == "simple":
         corpus = [s for s in corpus if s.isascii() and len(s) <= 40]
     random.Random(SEED).shuffle(corpus)
+    langs = args.languages.split(",") if args.languages else None
     os.makedirs(args.raw_dir, exist_ok=True)
 
     # One untimed call so lazy locale imports are not charged to the first sample.
-    dateparser.parse("2015-06-01")
+    dateparser.parse("2015-06-01", languages=langs)
 
     results = []
     for scale in [int(x) for x in args.scales.split(",")]:
         texts = corpus[:scale]
         for _ in range(args.warmup):
             for s in texts:
-                dateparser.parse(s)
+                dateparser.parse(s, languages=langs)
         samples = []
         for i in range(args.reps):
             t0 = time.perf_counter()
             for s in texts:
-                dateparser.parse(s)
+                dateparser.parse(s, languages=langs)
             elapsed = time.perf_counter() - t0
             rec = {
                 "impl": args.impl,
                 "workload": args.workload,
+        "languages": langs,
                 "scale": scale,
                 "n": len(texts),
                 "rep": i,
@@ -92,6 +95,7 @@ def main():
     payload = {
         "impl": args.impl,
         "workload": args.workload,
+        "languages": langs,
         "upstream_commit": UPSTREAM_COMMIT,
         "seed": SEED,
         "corpus_size": len(corpus),
